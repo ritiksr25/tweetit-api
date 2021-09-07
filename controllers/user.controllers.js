@@ -16,11 +16,12 @@ const {
 } = require('../utility/user.helpers.js');
 
 module.exports.create = async (req, res) => {
-	let { email, password, name, username } = req.body;
+	let { email, password, name, username, avatar, bio } = req.body;
 	email = String(email).toLowerCase().trim();
 	password = String(password).trim();
 	name = toTitleCase(String(name).trim());
 	username = String(username).trim();
+	bio = String(bio).trim();
 	const user = await knex('user')
 		.where('email', email)
 		.orWhere('username', username)
@@ -33,14 +34,16 @@ module.exports.create = async (req, res) => {
 			StatusCodes.BAD_REQUEST
 		);
 	const hash = await getHashedPassword(password);
-	const avatar = getDefaultAvatar(name);
+	if (avatar) avatar = String(avatar).trim();
+	else avatar = getDefaultAvatar(name);
 	const _user = await knex('user')
 		.insert({
 			username,
 			name,
 			email,
 			password: hash,
-			avatar
+			avatar,
+			bio
 		})
 		.returning('*');
 	sendSuccess(res, _user[0]);
@@ -61,4 +64,59 @@ module.exports.login = async (req, res) => {
 		return sendError(res, Errors.invalid_credentials, StatusCodes.BAD_REQUEST);
 	const token = await generateToken(user.id);
 	return sendSuccess(res, null, token);
+};
+
+module.exports.changePassword = async (req, res) => {
+	const { id } = req.user;
+	const { password, newPassword } = req.body;
+	const user = await knex('user').where('id', id).select('password').first();
+	const isValidPwd = await comparePasswords(password, user.password);
+	if (!user || !isValidPwd)
+		return sendError(res, Errors.old_pwd_not_matched, StatusCodes.BAD_REQUEST);
+	const hash = await getHashedPassword(newPassword);
+	await knex('user').where('id', id).update({ password: hash });
+	sendSuccess(res, null);
+};
+
+module.exports.getProfile = async (req, res) => {
+	const { id } = req.user;
+	const user = await knex('user')
+		.where('id', id)
+		.select(
+			'id',
+			'username',
+			'name',
+			'email',
+			'avatar',
+			'bio',
+			'location',
+			'created_at',
+			'updated_at'
+		)
+		.first();
+	if (!user)
+		return sendError(res, Errors.user_not_found, StatusCodes.BAD_REQUEST);
+	sendSuccess(res, user);
+};
+
+module.exports.updateProfile = async (req, res) => {
+	const { id } = req.user;
+	const { name, phone, location, avatar, bio } = req.body;
+	const user = await knex('user')
+		.where('id', id)
+		.select('id', 'name', 'phone', 'location', 'avatar', 'bio')
+		.first();
+	if (!user)
+		return sendError(res, Errors.user_not_found, StatusCodes.BAD_REQUEST);
+	const _user = await knex('user')
+		.where('id', id)
+		.update({
+			name: name ? name : user.name,
+			phone: phone ? phone : user.phone,
+			location: location ? location : user.location,
+			avatar: avatar ? avatar : user.avatar,
+			bio: bio ? bio : user.bio
+		})
+		.returning('*');
+	sendSuccess(res, _user[0]);
 };

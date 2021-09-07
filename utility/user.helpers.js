@@ -26,3 +26,12 @@ module.exports.generateToken = async id => {
 	});
 	return token;
 };
+
+module.exports.verifyToken = token => {
+	const decoded = jwt.verify(token, JwtConfig.JWT_PRIVATE_KEY, {
+		algorithms: [JwtConfig.JWT_ALGORITHM],
+		issuer: JwtConfig.JWT_ISSUER,
+		audience: JwtConfig.JWT_AUDIENCE
+	});
+	return decoded;
+};
