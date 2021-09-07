@@ -10,7 +10,9 @@ const {
 } = require('../utility/app.helpers');
 const {
 	getHashedPassword,
-	getDefaultAvatar
+	getDefaultAvatar,
+	comparePasswords,
+	generateToken
 } = require('../utility/user.helpers.js');
 
 module.exports.create = async (req, res) => {
@@ -42,4 +44,21 @@ module.exports.create = async (req, res) => {
 		})
 		.returning('*');
 	sendSuccess(res, _user[0]);
+};
+
+module.exports.login = async (req, res) => {
+	let { email, password, username } = req.body;
+	if (email) email = String(email).toLowerCase().trim();
+	if (username) username = String(username).trim();
+	password = String(password).trim();
+	const user = await knex('user')
+		.where('email', email ? email : '')
+		.orWhere('username', username ? username : '')
+		.select('id', 'password')
+		.first();
+	const isValidPwd = await comparePasswords(password, user.password);
+	if (!user || !isValidPwd)
+		return sendError(res, Errors.invalid_credentials, StatusCodes.BAD_REQUEST);
+	const token = await generateToken(user.id);
+	return sendSuccess(res, null, token);
 };
