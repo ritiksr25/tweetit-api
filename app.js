@@ -23,6 +23,7 @@ module.exports = () => {
 	//Routes
 	app.get('/', (req, res) => sendSuccess(res, null));
 	app.use('/api/v1/users', require('./routes/api/v1/user.routes'));
+	app.use('/api/v1/follows', require('./routes/api/v1/follow.routes'));
 	// 404 route
 	app.use('*', notFound);
 
