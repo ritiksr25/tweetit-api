@@ -1,4 +1,4 @@
 module.exports = {
-  ...require("./errors.enum"),
-  ...require("./status.enum"),
+	...require('./errors.enum'),
+	...require('./status.enum')
 };

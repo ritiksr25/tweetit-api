@@ -1,7 +1,7 @@
 exports.up = async function (knex) {
-    await knex.schema.alterTable('user', table => {
-        table.primary('id');
-    })
+	await knex.schema.alterTable('user', table => {
+		table.primary('id');
+	});
 	await knex.schema.table('follow', table => {
 		table
 			.foreign('followerId')
@@ -19,11 +19,10 @@ exports.up = async function (knex) {
 
 exports.down = async function (knex) {
 	await knex.schema.alterTable('user', table => {
-        table.dropPrimary();
-    })
-    await knex.schema.table('follow', table => {
+		table.dropPrimary();
+	});
+	await knex.schema.table('follow', table => {
 		table.dropForeign('followerId');
 		table.dropForeign('followingId');
 	});
-
 };
