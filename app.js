@@ -1,12 +1,12 @@
 const express = require('express');
 const compression = require('compression');
 const helmet = require('helmet');
-const knex = require('./knex/knex.js');
 const app = express();
 
 const cors = require('cors');
 const { AppConfig } = require('./config/app.config');
 const { notFound, sendErrors } = require('./config/error.config');
+const { sendSuccess } = require('./utility/app.helpers');
 require('dotenv').config();
 
 module.exports = () => {
@@ -20,8 +20,9 @@ module.exports = () => {
 		console.log = console.warn = console.error = () => {};
 	}
 
-	//load Schemas
 	//Routes
+	app.get('/', (req, res) => sendSuccess(res, null));
+	app.use('/api/v1/users', require('./routes/api/v1/user.routes'));
 	// 404 route
 	app.use('*', notFound);
 

@@ -13,9 +13,11 @@ exports.up = async function (knex) {
 		table.string('bio');
 		table.timestamps(true, true);
 	});
+	return;
 };
 
-exports.down = function (knex) {
+exports.down = async function (knex) {
 	await knex.raw('drop extension if exists "uuid-ossp"');
-	await knex.schema.dropTable('user');
+	await knex.schema.dropTableIfExists('user');
+	return;
 };

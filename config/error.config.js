@@ -1,5 +1,5 @@
-const { sendError } = require("../utility/helpers");
-const { Errors, StatusCodes } = require("../common/enums");
+const { sendError } = require('../utility/app.helpers');
+const { Errors, StatusCodes } = require('../enums');
 
 module.exports.catchErrors = middlewareFunction => {
 	return async (req, res, next) => {

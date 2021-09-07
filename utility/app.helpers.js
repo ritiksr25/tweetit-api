@@ -1,5 +1,8 @@
-const { StatusCodes } = require('../common/enums');
+const { StatusCodes } = require('../enums');
 const { AppConfig } = require('../config/app.config');
+
+module.exports.getMissingFieldError = field =>
+	`Please provide a valid ${field}`;
 
 module.exports.sendError = (res, message, status) => {
 	return res.status(status).json({
