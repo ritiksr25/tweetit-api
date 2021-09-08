@@ -13,6 +13,9 @@ tweetit is a microblogging platform where users post or tweets
 - follow or unfollow other users
 - tweet with hashtags
 - get timeline feeds by tweets from users they follow
+- get other user tweets
+- get trending tags
+- get tweets by tag
 
 ## technologies used
 
@@ -25,6 +28,21 @@ tweetit is a microblogging platform where users post or tweets
 ## system overview
 
 !["system-overview"](https://drive.google.com/uc?export=view&id=1MJt9sh1ZIFrA_O4ixnxlmIRwZ1NJS9pq)
+
+- server: main node process
+- server has 3 main modules
+  - user: handle user registration, login profile, etc
+  - follow: handle user following/unfollowing each other, get followers/following
+  - tweet: handle tweets, timelines and tags
+- all modules dump data in primary database or "single source of truth", postgres
+- redis: serves caching and other requirements:
+  - cache user profiles, follower, tags, etc for faster read and reducing load on db
+  - used to store message queue jobs
+  - used for rate limiting
+- bull mq:
+  - performs asynchronous background processing on top of redis
+  - any module can add defined job to execute
+  - currently using for syncing tags information of tweets
 
 ## database schema
 
@@ -110,3 +128,17 @@ $ npm run migrate:latest # or yarn run migrate:latest
 ```bash
 $ npm run dev # or yarn run dev
 ```
+
+## scaling and failure
+
+- how the system can scale
+
+  - multiple cluter workers are deployed for each thread
+  - database can be scaled independently
+  - caching improves response time, and reduces load on primary database
+  - messaging queue processes job asynchronously in background, hence main thread remain unoccupied
+
+- limiting factors
+  - too much redundant queries on db
+  - if a user has too many followers/following (famous), needs to be handled differently in queries
+  - caching everything is also not desirable
