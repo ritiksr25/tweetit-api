@@ -9,7 +9,7 @@ module.exports.getFromCache = async key => {
 };
 
 module.exports.setInCache = (key, value, expiry) => {
-	if (expiry) client.setex(key, exp, value);
+	if (expiry) client.setex(key, expiry, value);
 	else client.set(key, value);
 };
 

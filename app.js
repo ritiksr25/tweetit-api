@@ -7,6 +7,7 @@ const cors = require('cors');
 const { AppConfig } = require('./config/app.config');
 const { notFound, sendErrors } = require('./config/error.config');
 const { sendSuccess } = require('./utility/app.helpers');
+const { logRequestMiddleware } = require('./middlewares/log.middlewares');
 require('dotenv').config();
 
 module.exports = () => {
@@ -15,7 +16,7 @@ module.exports = () => {
 	app.use(cors({ exposedHeaders: AppConfig.TOKEN_HEADER }));
 	app.use(express.json({ extended: true }));
 	app.use(express.urlencoded({ extended: true }));
-
+	app.use(logRequestMiddleware);
 	if (AppConfig.NODE_ENV === 'production') {
 		console.log = console.warn = console.error = () => {};
 	}

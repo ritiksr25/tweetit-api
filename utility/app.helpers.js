@@ -51,3 +51,10 @@ module.exports.generateHash = length => {
 	}
 	return code;
 };
+
+const NS_PER_SEC = 1e9;
+const NS_TO_MS = 1e6;
+
+module.exports.formatHrTime = hrt => {
+	return (hrt[0] * NS_PER_SEC + hrt[1]) / NS_TO_MS;
+};
