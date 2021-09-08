@@ -26,7 +26,7 @@ module.exports.globalRateLimiter =
 		? (req, res, next) => next()
 		: new RateLimit({
 				store: new RedisStore({ prefix: 'rl:global' }),
-				...constructRateLimitObj(60000, 4, 'Too many requests.')
+				...constructRateLimitObj(60000, 100, 'Too many requests.')
 		  });
 
 module.exports.loginRateLimiter =

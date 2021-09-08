@@ -3,7 +3,7 @@
 tweetit is a microblogging platform where users post or tweets
 
 [![docs](https://img.shields.io/badge/Documentation-see%20docs-green?style=for-the-badge&logo=appveyor)](https://documenter.getpostman.com/view/14486984/U16huT6f)
-[![link](https://img.shields.io/badge/deployed%20link-visit-orange?style=for-the-badge&logo=appveyor)](https://tweetit-api.herokuapp.com/)
+[![link](https://img.shields.io/badge/deployed%20link-visit-orange?style=for-the-badge&logo=appveyor)](http://65.0.142.200/)
 
 ## features
 
