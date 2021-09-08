@@ -7,5 +7,6 @@ module.exports.Errors = {
 	access_denied: 'Access denied',
 	same_pwd: 'New password and old password cannot be same',
 	old_pwd_not_matched: 'Old password is not matched',
-	user_not_found: 'User not found'
+	user_not_found: 'User not found',
+	tweet_length: 'Tweet length should be less than 140 characters'
 };
