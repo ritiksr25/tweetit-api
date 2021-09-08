@@ -16,6 +16,19 @@ module.exports.tweet = async (req, res) => {
 	return sendSuccess(res, tweet[0]);
 };
 
+module.exports.togglePinTweet = async (req, res) => {
+	const { tweetId } = req.params;
+	const tweet = await knex('tweet')
+		.update({
+			isPinned: knex.raw('NOT ??', ['isPinned'])
+		})
+		.where('id', tweetId)
+		.andWhere('authorId', req.user.id)
+		.returning('id', 'isPinned');
+
+	return sendSuccess(res, tweet);
+};
+
 module.exports.getTweets = async (req, res) => {
 	const tweets = await knex('tweet')
 		.leftJoin('user', 'tweet.authorId', 'user.id')
@@ -47,6 +60,37 @@ module.exports.getUserTweets = async (req, res) => {
 	const tweets = await knex('tweet')
 		.select('id', 'text', 'isPinned', 'created_at')
 		.where('authorId', authorId)
+		.orderBy('tweet.isPinned', 'desc')
 		.orderBy('tweet.created_at', 'desc');
+	return sendSuccess(res, tweets);
+};
+
+module.exports.getTags = async (req, res) => {
+	const tags = await knex('tag')
+		.select('id', 'tag', 'hits')
+		.orderBy('hits', 'desc');
+	return sendSuccess(res, tags);
+};
+
+module.exports.getTweetsByTag = async (req, res) => {
+	const { tagId } = req.params;
+	const tweets = await knex('tweet')
+		.leftJoin('user', 'tweet.authorId', 'user.id')
+		.whereIn(
+			'tweet.id',
+			knex('tweet_tag').select('tweetId').where('tagId', tagId)
+		)
+		.select(
+			'tweet.id',
+			'text',
+			'isPinned',
+			'authorId',
+			'tweet.created_at',
+			'username',
+			'avatar',
+			'name',
+			'location',
+			'bio'
+		);
 	return sendSuccess(res, tweets);
 };

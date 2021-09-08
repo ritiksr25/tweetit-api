@@ -4,7 +4,10 @@ const router = express.Router();
 const {
 	tweet,
 	getTweets,
-	getUserTweets
+	getUserTweets,
+	getTweetsByTag,
+	togglePinTweet,
+	getTags
 } = require('../../../controllers/tweet.controllers');
 // middlewares
 const { catchErrors } = require('../../../config/error.config');
@@ -25,6 +28,18 @@ router.get(
 	userAuth,
 	catchErrors(getUserTweets)
 );
-
+router.post(
+	'/toggle-pin/:tweetId',
+	paramAndQueryUuidValidations,
+	userAuth,
+	catchErrors(togglePinTweet)
+);
+router.get('/tags', userAuth, catchErrors(getTags));
+router.get(
+	'/:tagId',
+	paramAndQueryUuidValidations,
+	userAuth,
+	catchErrors(getTweetsByTag)
+);
 // export router
 module.exports = router;
