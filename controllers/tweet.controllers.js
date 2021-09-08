@@ -3,6 +3,7 @@ const knex = require('../knex/knex.js');
 // import helper functions
 const { sendError, sendSuccess } = require('../utility/app.helpers');
 const { createSyncTweetTagsJob } = require('../queues/tweet/tweet.queue.js');
+const { getFromCache, setInCache } = require('../services/cache.service.js');
 
 module.exports.tweet = async (req, res) => {
 	const { text } = req.body;
@@ -50,7 +51,8 @@ module.exports.getTweets = async (req, res) => {
 				.select('follow.followingId')
 				.where('followerId', req.user.id)
 		)
-		.orderBy('tweet.created_at', 'desc');
+		.orderBy('tweet.created_at', 'desc')
+		.orderBy('user.last_active_at', 'desc');
 	return sendSuccess(res, tweets);
 };
 
@@ -66,9 +68,12 @@ module.exports.getUserTweets = async (req, res) => {
 };
 
 module.exports.getTags = async (req, res) => {
+	const tagsFromCache = await getFromCache(`tweet_tags`);
+	if (tagsFromCache) return sendSuccess(JSON.parse(tagsFromCache));
 	const tags = await knex('tag')
 		.select('id', 'tag', 'hits')
 		.orderBy('hits', 'desc');
+	setInCache(`tweet_tags`, JSON.stringify(tags), 3600);
 	return sendSuccess(res, tags);
 };
 

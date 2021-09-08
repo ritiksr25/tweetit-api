@@ -14,6 +14,7 @@ const {
 	comparePasswords,
 	generateToken
 } = require('../utility/user.helpers.js');
+const { setInCache, getFromCache } = require('../services/cache.service.js');
 
 module.exports.create = async (req, res) => {
 	let { email, password, name, username, avatar, bio } = req.body;
@@ -46,6 +47,7 @@ module.exports.create = async (req, res) => {
 			bio
 		})
 		.returning('*');
+	setInCache(`user:${_user[0].id}`, JSON.stringify(_user[0]));
 	sendSuccess(res, _user[0]);
 };
 
@@ -111,10 +113,15 @@ module.exports.getProfile = async (req, res) => {
 module.exports.updateProfile = async (req, res) => {
 	const { id } = req.user;
 	const { name, phone, location, avatar, bio } = req.body;
-	const user = await knex('user')
-		.where('id', id)
-		.select('id', 'name', 'phone', 'location', 'avatar', 'bio')
-		.first();
+	let user;
+	user = await getFromCache(`user:${id}`);
+	if (user) user = JSON.parse(user);
+	if (!user)
+		user = await knex('user')
+			.where('id', id)
+			.select('id', 'name', 'phone', 'location', 'avatar', 'bio')
+			.first();
+
 	if (!user)
 		return sendError(res, Errors.user_not_found, StatusCodes.BAD_REQUEST);
 	const _user = await knex('user')
@@ -127,5 +134,6 @@ module.exports.updateProfile = async (req, res) => {
 			bio: bio ? bio : user.bio
 		})
 		.returning('*');
+	setInCache(`user:${id}`, JSON.stringify(_user[0]));
 	sendSuccess(res, _user[0]);
 };

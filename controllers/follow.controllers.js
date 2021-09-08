@@ -4,6 +4,7 @@ const knex = require('../knex/knex.js');
 const { StatusCodes, Errors } = require('../enums');
 // import helper functions
 const { sendError, sendSuccess } = require('../utility/app.helpers');
+const { getFromCache, setInCache } = require('../services/cache.service.js');
 
 module.exports.toggleFollow = async (req, res) => {
 	const { followingId } = req.params;
@@ -28,6 +29,11 @@ module.exports.getFollowers = async (req, res) => {
 	const { userId } = req.query;
 	const authorId = userId || req.user.id;
 	const { page = 1, perPage = 20 } = req.query;
+	const followersFromCache = await getFromCache(
+		`followers:${authorId}:${page}:${perPage}`
+	);
+	if (followersFromCache)
+		return sendSuccess(res, JSON.parse(followersFromCache));
 	const offset = (page - 1) * perPage;
 	const pagination = {};
 	const totalFollowers = await knex('follow').count('* as count').first();
@@ -43,6 +49,11 @@ module.exports.getFollowers = async (req, res) => {
 	pagination.page = page;
 	pagination.totalPages = Math.ceil(totalFollowers.count / perPage);
 
+	setInCache(
+		`followers:${authorId}:${page}:${perPage}`,
+		JSON.stringify({ followers, pagination }),
+		3600
+	);
 	return sendSuccess(res, { followers, pagination });
 };
 
@@ -50,6 +61,11 @@ module.exports.getFollowing = async (req, res) => {
 	const { userId } = req.query;
 	const authorId = userId || req.user.id;
 	const { page = 1, perPage = 20 } = req.query;
+	const followingFromCache = await getFromCache(
+		`following:${authorId}:${page}:${perPage}`
+	);
+	if (followingFromCache)
+		return sendSuccess(res, JSON.parse(followingFromCache));
 	const offset = (page - 1) * perPage;
 	const pagination = {};
 	const totalFollowers = await knex('follow').count('* as count').first();
@@ -64,6 +80,10 @@ module.exports.getFollowing = async (req, res) => {
 	pagination.perPage = perPage;
 	pagination.page = page;
 	pagination.totalPages = Math.ceil(totalFollowers.count / perPage);
-
+	setInCache(
+		`following:${authorId}:${page}:${perPage}`,
+		JSON.stringify({ following, pagination }),
+		3600
+	);
 	return sendSuccess(res, { following, pagination });
 };
