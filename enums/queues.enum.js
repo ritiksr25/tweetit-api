@@ -1,3 +1,3 @@
 module.exports.Queues = {
-	INDEX_QUEUE: 'INDEX_QUEUE'
+	TWEET_QUEUE: 'TWEET_QUEUE'
 };

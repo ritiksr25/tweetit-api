@@ -18,7 +18,7 @@ module.exports.paramAndQueryUuidValidations = (req, res, next) => {
 	const queries = req.query;
 	for (let i = 0; i < Object.values(queries).length; i++) {
 		const query = Object.values(queries)[i];
-		if (query && !uuidRegex.test(param)) {
+		if (query && !uuidRegex.test(query)) {
 			return sendError(
 				res,
 				getMissingFieldError(Object.keys(queries)[i]),
