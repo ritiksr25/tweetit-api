@@ -17,16 +17,16 @@ const {
 // routes
 router.post('/toggle-follow/:followingId', userAuth, catchErrors(toggleFollow));
 router.get(
-	'/get-followers/:userId',
-	userAuth,
+	'/get-followers',
 	paramAndQueryUuidValidations,
+	userAuth,
 	paginationValidations,
 	catchErrors(getFollowers)
 );
 router.get(
-	'/get-following/:userId',
-	userAuth,
+	'/get-following',
 	paramAndQueryUuidValidations,
+	userAuth,
 	paginationValidations,
 	catchErrors(getFollowing)
 );

@@ -18,27 +18,35 @@ const {
 	changePasswordValidation,
 	updateUserValidation
 } = require('../../../validations/user.validations');
+const {
+	paramAndQueryUuidValidations
+} = require('../../../validations/common.validations');
 
 // routes
 router.post('/', createUserValidation, catchErrors(create));
 router.post('/login', loginUserValidation, catchErrors(login));
 router.post(
 	'/change-pwd',
-	userAuth,
 	changePasswordValidation,
+	userAuth,
 	catchErrors(changePassword)
 );
 router.post(
 	'/change-pwd',
-	userAuth,
 	changePasswordValidation,
+	userAuth,
 	catchErrors(changePassword)
 );
-router.get('/profile', userAuth, catchErrors(getProfile));
+router.get(
+	'/profile',
+	paramAndQueryUuidValidations,
+	userAuth,
+	catchErrors(getProfile)
+);
 router.post(
 	'/profile',
-	userAuth,
 	updateUserValidation,
+	userAuth,
 	catchErrors(updateProfile)
 );
 

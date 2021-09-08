@@ -79,7 +79,8 @@ module.exports.changePassword = async (req, res) => {
 };
 
 module.exports.getProfile = async (req, res) => {
-	const { id } = req.user;
+	const { userId } = req.query;
+	const id = userId || req.user.id;
 	const user = await knex('user')
 		.where('id', id)
 		.select(
@@ -96,6 +97,14 @@ module.exports.getProfile = async (req, res) => {
 		.first();
 	if (!user)
 		return sendError(res, Errors.user_not_found, StatusCodes.BAD_REQUEST);
+	if (userId && userId !== req.user.id) {
+		const following = await knex('follow')
+			.select('id')
+			.where('followerId', req.user.id)
+			.andWhere('followingId', userId)
+			.first();
+		user['isFollowing'] = following ? false : true;
+	}
 	sendSuccess(res, user);
 };
 

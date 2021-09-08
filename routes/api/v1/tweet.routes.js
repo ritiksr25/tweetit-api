@@ -18,7 +18,7 @@ const {
 } = require('../../../validations/common.validations');
 // routes
 router.get('/', userAuth, catchErrors(getTweets));
-router.post('/', userAuth, createTweetValidation, catchErrors(tweet));
+router.post('/', createTweetValidation, userAuth, catchErrors(tweet));
 router.get(
 	'/user',
 	paramAndQueryUuidValidations,
