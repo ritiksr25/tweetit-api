@@ -24,10 +24,13 @@
 	"bugs": {
 		"url": "https://github.com/ritiksr25/tweetit-api/issues"
 	},
-	"homepage": "https://github.com/ritiksr25/tweetit-api#README",
+	"homepage": "https://tweetit-api.herokuapp.com/",
 	"keywords": [
 		"tweet",
-		"tweetit"
+		"tweetit",
+		"bullmq",
+		"caching",
+		"feeds"
 	],
 	"dependencies": {
 		"bcryptjs": "^2.4.3",
