@@ -1,8 +1,12 @@
+const url = require('url');
 require('dotenv').config();
 
-module.exports.RedisConfig = {
+const redisURL = url.parse(process.env.REDIS_URL);
+const RedisConfig = {
 	url: process.env.REDIS_URL,
-	host: process.env.REDIS_HOST,
-	port: process.env.REDIS_PORT,
-	password: process.env.REDIS_PASSWORD
+	host: redisURL.hostname,
+	port: redisURL.port
 };
+
+if (redisURL.auth) RedisConfig.password = redisURL.auth.split(':')[1];
+module.exports.RedisConfig = RedisConfig;

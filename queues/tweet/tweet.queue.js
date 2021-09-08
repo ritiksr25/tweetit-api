@@ -1,9 +1,9 @@
 const { Queue, Worker, QueueEvents } = require('bullmq');
+const { RedisConfig } = require('../../config/redis.config');
 const { Queues } = require('../../enums/queues.enum');
-const { redisConfigObj } = require('../common');
 const { syncTweetTags } = require('./tweet.processor');
 const TweetQueue = new Queue(Queues.TWEET_QUEUE, {
-	connection: redisConfigObj
+	connection: RedisConfig
 });
 const queueEvents = new QueueEvents(Queues.TWEET_QUEUE);
 
@@ -31,5 +31,5 @@ new Worker(
 			return resp;
 		}
 	},
-	{ connection: redisConfigObj }
+	{ connection: RedisConfig }
 );

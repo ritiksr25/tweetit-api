@@ -2,7 +2,10 @@ const { promisify } = require('util');
 const redis = require('redis');
 const { RedisConfig } = require('../config/redis.config');
 
-const client = redis.createClient({ url: RedisConfig.url });
+const client = redis.createClient(RedisConfig.port, RedisConfig.host, {
+	no_ready_check: true
+});
+if (RedisConfig.password) client.auth(RedisConfig.password);
 client.on('error', function (error) {
 	console.error(error);
 });

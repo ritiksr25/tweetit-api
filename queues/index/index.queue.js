@@ -1,9 +1,9 @@
 const { Queue, Worker, QueueEvents } = require('bullmq');
+const { RedisConfig } = require('../../config/redis.config');
 const { Queues } = require('../../enums/queues.enum');
-const { redisConfigObj } = require('../common');
 const { syncLastActive } = require('./index.processor');
 const IndexQueue = new Queue(Queues.INDEX_QUEUE, {
-	connection: redisConfigObj
+	connection: RedisConfig
 });
 const queueEvents = new QueueEvents(Queues.INDEX_QUEUE);
 
@@ -29,5 +29,5 @@ new Worker(
 			return resp;
 		}
 	},
-	{ connection: redisConfigObj }
+	{ connection: RedisConfig }
 );
