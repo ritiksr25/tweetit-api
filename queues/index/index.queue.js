@@ -1,7 +1,10 @@
 const { Queue, Worker, QueueEvents } = require('bullmq');
 const { Queues } = require('../../enums/queues.enum');
+const { redisConfigObj } = require('../common');
 const { syncLastActive } = require('./index.processor');
-const IndexQueue = new Queue(Queues.INDEX_QUEUE);
+const IndexQueue = new Queue(Queues.INDEX_QUEUE, {
+	connection: redisConfigObj
+});
 const queueEvents = new QueueEvents(Queues.INDEX_QUEUE);
 
 queueEvents.on('active', ({ jobId, prev }) => {
@@ -18,9 +21,13 @@ module.exports.createSyncLastActiveJob = async data => {
 	await IndexQueue.add('syncLastActiveJob', data);
 };
 
-new Worker(Queues.INDEX_QUEUE, async job => {
-	if (job.name === 'syncLastActiveJob') {
-		const resp = await syncLastActive(job.data);
-		return resp;
-	}
-});
+new Worker(
+	Queues.INDEX_QUEUE,
+	async job => {
+		if (job.name === 'syncLastActiveJob') {
+			const resp = await syncLastActive(job.data);
+			return resp;
+		}
+	},
+	{ connection: redisConfigObj }
+);

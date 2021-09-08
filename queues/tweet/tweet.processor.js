@@ -31,5 +31,5 @@ module.exports.syncTweetTags = async ({ id, text }) => {
 		};
 	});
 	await knex('tweet_tag').insert(tagSaveArr);
-	return;
+	return allTags;
 };

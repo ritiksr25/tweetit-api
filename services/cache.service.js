@@ -1,6 +1,11 @@
 const { promisify } = require('util');
 const redis = require('redis');
-const client = redis.createClient();
+const { RedisConfig } = require('../config/redis.config');
+
+const client = redis.createClient({ url: RedisConfig.url });
+client.on('error', function (error) {
+	console.error(error);
+});
 const getAsync = promisify(client.get).bind(client);
 
 module.exports.getFromCache = async key => {
