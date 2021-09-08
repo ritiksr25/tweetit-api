@@ -21,18 +21,23 @@ const {
 const {
 	paramAndQueryUuidValidations
 } = require('../../../validations/common.validations');
+const {
+	loginRateLimiter,
+	changePasswordRateLimiter,
+	updateProfileRateLimiter
+} = require('../../../middlewares/ratelimit.middlewares');
 
 // routes
 router.post('/', createUserValidation, catchErrors(create));
-router.post('/login', loginUserValidation, catchErrors(login));
 router.post(
-	'/change-pwd',
-	changePasswordValidation,
-	userAuth,
-	catchErrors(changePassword)
+	'/login',
+	loginRateLimiter,
+	loginUserValidation,
+	catchErrors(login)
 );
 router.post(
 	'/change-pwd',
+	changePasswordRateLimiter,
 	changePasswordValidation,
 	userAuth,
 	catchErrors(changePassword)
@@ -45,6 +50,7 @@ router.get(
 );
 router.post(
 	'/profile',
+	updateProfileRateLimiter,
 	updateUserValidation,
 	userAuth,
 	catchErrors(updateProfile)

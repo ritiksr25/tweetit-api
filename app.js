@@ -8,6 +8,7 @@ const { AppConfig } = require('./config/app.config');
 const { notFound, sendErrors } = require('./config/error.config');
 const { sendSuccess } = require('./utility/app.helpers');
 const { logRequestMiddleware } = require('./middlewares/log.middlewares');
+const { globalRateLimiter } = require('./middlewares/ratelimit.middlewares');
 require('dotenv').config();
 
 module.exports = () => {
@@ -17,6 +18,7 @@ module.exports = () => {
 	app.use(express.json({ extended: true }));
 	app.use(express.urlencoded({ extended: true }));
 	app.use(logRequestMiddleware);
+	app.use(globalRateLimiter);
 	if (AppConfig.NODE_ENV === 'production') {
 		console.log = console.warn = console.error = () => {};
 	}
